@@ -1,0 +1,28 @@
+[theme]
+base = "light"
+backgroundColor = "#F4F2E9"
+secondaryBackgroundColor = "#E5E8DC"
+textColor = "#203D34"
+primaryColor = "#1C443A"
+font = "Open Sans, sans-serif"
+headingFont = "Bubblegum Sans, sans-serif"
+baseRadius = "0.3rem"
+buttonRadius = "0.3rem"
+
+[[theme.fontFaces]]
+family = "Open Sans"
+url = "app/static/open-sans.woff2"
+weight = "400 800"
+style = "normal"
+
+[[theme.fontFaces]]
+family = "Bubblegum Sans"
+url = "app/static/bubblegum-sans.woff2"
+weight = "400"
+style = "normal"
+
+[server]
+enableStaticServing = true
+
+[browser]
+gatherUsageStats = false
