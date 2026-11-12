@@ -3,10 +3,17 @@
 A small, Python-only Streamlit app comparing two existing Foundry deployments:
 `Decision-1` and `gpt-6-sol`. Paste an email and select **Send to both models**.
 Both calls run concurrently, and each result appears as soon as it finishes.
+For a quick start, **Use sample email** fills the editable textbox without sending
+anything. Select **Send to both models** when ready.
 
 Each model panel shows its selected urgency and department with likelihoods,
 API-call time, and estimated USD cost. Expand **Likelihoods & token usage** to
 see every label's likelihood as a horizontal bar and the reported token counts.
+Once both models finish, one compact line compares their speed and estimated
+cost for that run. It names whichever model wins each measure, handles ties,
+and does not invent a cost ratio when usage is missing or a cost is zero.
+A shared note clarifies that likelihoods are not measured accuracy and GPT
+scores are self-reported.
 No tests or test framework are included.
 
 The **Single email** tab keeps this full comparison. In **Batch emails**, upload
@@ -21,14 +28,19 @@ email
 "Please send the benefits guide, when convenient."
 ```
 
+The upload is checked immediately and shows how many emails are ready.
+Batch Send stays disabled until the CSV is valid; invalid rows are explained
+before any model calls begin.
+
 Select **Send batch to both models** to send all rows in one request to each
 deployment: two requests total, submitted concurrently. This is prompt batching,
 not ten independent calls per model.
 Results are grouped by model, with Email 1, Email 2, and so on listed underneath.
 Each email shows the selected urgency and department, including their winning
 likelihoods. **Batch API time** appears once per model and measures its entire
-request, not any individual email's latency. There are no per-email times,
-per-option bars, token counts, or costs in the batch results. Email previews
+request, not any individual email's latency. The comparison line uses whole-batch
+API times and total estimated request costs. There are no per-email times,
+per-option bars, token counts, or individual costs in the batch results. Email previews
 identify the rows, and each model's list keeps the CSV's order. Blank emails
 and malformed CSV rows are reported before any model calls begin.
 Quoted multiline emails and UTF-8 files with a byte-order mark are supported.
@@ -167,9 +179,13 @@ persimmon for GPT, with subtly rounded corners, Bubblegum Sans headings, and
 Open Sans body text. Both fonts are bundled in `static/` and served locally,
 with their SIL Open Font Licenses in `static/BubblegumSans-OFL.txt` and
 `static/OpenSans-OFL.txt`. Segoe UI / sans-serif provides fallback glyphs.
-The pine title panel uses a static envelope-and-routing motif; matching pine and
-persimmon model headers make the comparison easy to scan. The motif is hidden
-on small screens to keep the email composer prominent.
+The compact pine title panel uses a static envelope-and-routing motif; matching
+pine and persimmon model headers make the comparison easy to scan. Spacing follows
+quarter-rem increments, with one-rem panel padding and tighter header gaps to bring
+the composer and results higher on screen without shrinking the textbox or buttons.
+The motif is hidden on small screens to keep the email composer prominent.
+Send buttons have envelope and arrow details that react to pointer hover,
+and the sliding tab surface has a contrasting edge with single/stacked-mail icons.
 Send buttons have a raised base and a 160 ms downward press that works with
 mouse and touch. Browser-style tabs slide only their selected surface in 250 ms;
 the content stays still, and a stable scrollbar gutter prevents horizontal jumps

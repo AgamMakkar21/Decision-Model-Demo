@@ -31,9 +31,10 @@ MODELS = (
     (DECISION_MODEL, "decision_panel", "Decision model"),
     (GPT_MODEL, "gpt_panel", "General-purpose model"),
 )
+SAMPLE_EMAIL = "Our email server is down. Please restore service immediately."
 SAMPLE_CSV = (
     "email\n"
-    "Our email server is down. Please restore service immediately.\n"
+    f"{SAMPLE_EMAIL}\n"
     "Please send the updated employee benefits guide when convenient.\n"
     "Please review the supplier contract before tomorrow afternoon.\n"
     "My laptop keeps losing its Wi-Fi connection. "
@@ -315,6 +316,57 @@ def show_summary(probabilities):
         st.write(f"**{name.title()}:** {winner} ({scores[winner]:.1%})")
 
 
+def estimated_cost(result, price):
+    _, input_tokens, output_tokens, _ = result
+    if input_tokens is None or output_tokens is None:
+        return None
+    return (input_tokens + output_tokens) * price / 1_000_000
+
+
+def comparison_text(decision, gpt):
+    comparisons = []
+    for metric, adjective, decision_value, gpt_value in (
+        ("API time", "faster", decision[3], gpt[3]),
+        ("estimated cost", "cheaper (estimated)",
+         estimated_cost(decision, PRICES[DECISION_MODEL]),
+         estimated_cost(gpt, PRICES[GPT_MODEL])),
+    ):
+        label = metric[0].upper() + metric[1:]
+        if decision_value is None or gpt_value is None:
+            comparisons.append((None, f"{label} comparison unavailable"))
+        elif decision_value == gpt_value:
+            comparisons.append((None, f"Same {metric}"))
+        elif min(decision_value, gpt_value) <= 0:
+            comparisons.append((None, f"{label} ratio unavailable (zero reported value)"))
+        else:
+            ratio = max(decision_value, gpt_value) / min(decision_value, gpt_value)
+            if round(ratio, 1) == 1:
+                comparisons.append((None, f"Similar {metric}"))
+            else:
+                winner = DECISION_MODEL if decision_value < gpt_value else GPT_MODEL
+                comparisons.append((winner, f"{ratio:.1f}x {adjective}"))
+    if comparisons[0][0] is not None and comparisons[0][0] == comparisons[1][0]:
+        return (
+            f"**{comparisons[0][0]}** was **{comparisons[0][1]}** "
+            f"and **{comparisons[1][1]}** on this run."
+        )
+    return "; ".join(
+        f"**{model}: {text}**" if model else text for model, text in comparisons
+    ) + " on this run."
+
+
+def show_comparison(results):
+    successful = {
+        model: result for model, result in results.items()
+        if result is not None and not isinstance(result, str)
+    }
+    if not successful:
+        return
+    if DECISION_MODEL in successful and GPT_MODEL in successful:
+        st.markdown(comparison_text(successful[DECISION_MODEL], successful[GPT_MODEL]))
+    st.caption("Likelihoods are not measured accuracy. GPT scores are self-reported.")
+
+
 def show_batch_result(result, emails):
     if isinstance(result, str):
         st.error(result)
@@ -334,12 +386,10 @@ def show_result(result, price: float):
         st.error(result)
         return
     probabilities, input_tokens, output_tokens, seconds = result
-    if input_tokens is None or output_tokens is None:
-        show_metrics(seconds, None)
+    cost = estimated_cost(result, price)
+    show_metrics(seconds, cost)
+    if cost is None:
         st.caption("Cost unavailable: the API did not report complete token usage.")
-    else:
-        cost = (input_tokens + output_tokens) * price / 1_000_000
-        show_metrics(seconds, cost)
     show_summary(probabilities)
     with st.expander("Likelihoods & token usage"):
         for name, question in QUESTIONS.items():
@@ -353,23 +403,35 @@ def show_result(result, price: float):
         )
 
 
+def use_sample_email():
+    st.session_state["email_body"] = SAMPLE_EMAIL
+
+
 def show_single_email_demo():
     with st.form("email_form"):
         email = st.text_area(
             "Email body",
+            key="email_body",
             height=150,
             placeholder="Type or paste an email. Both models will read the same message.",
         )
-        send = st.form_submit_button("Send to both models", type="primary")
+        with st.container(horizontal=True, vertical_alignment="center", key="single_actions"):
+            send = st.form_submit_button("Send to both models", type="primary", key="send_email")
+            st.form_submit_button(
+                "Use sample email", key="sample_email", on_click=use_sample_email
+            )
 
     if send and not email.strip():
         st.warning("Enter an email body before sending.")
         send = False
 
+    comparison = st.empty()
     panels = make_model_panels()
 
     if not send:
         results = st.session_state.get("results", {})
+        with comparison.container():
+            show_comparison(results)
         for model in panels:
             with panels[model].container():
                 if model in results:
@@ -397,6 +459,8 @@ def show_single_email_demo():
         st.session_state["results"][model] = result
         with panels[model].container():
             show_result(result, PRICES[model])
+        with comparison.container():
+            show_comparison(st.session_state["results"])
 
 
 def show_batch_demo():
@@ -406,8 +470,17 @@ def show_batch_demo():
             type=["csv"],
             help="One email per row. Put bodies containing commas or line breaks inside double quotes.",
         )
+        emails = None
+        if uploaded is not None:
+            try:
+                emails = read_email_csv(uploaded.getvalue())
+            except (UnicodeDecodeError, csv.Error, ValueError) as error:
+                st.error(f"Cannot read this CSV. Save it as UTF-8 and check its rows. Details: {error}")
+            else:
+                email_word = "email" if len(emails) == 1 else "emails"
+                st.caption(f"{len(emails)} {email_word} ready")
         with st.container(horizontal=True, vertical_alignment="center", key="batch_actions"):
-            send = st.button("Send batch to both models", type="primary")
+            send = st.button("Send batch to both models", type="primary", disabled=emails is None)
             st.download_button(
                 "Download sample CSV",
                 data=SAMPLE_CSV,
@@ -417,14 +490,6 @@ def show_batch_demo():
             )
 
     if send:
-        if uploaded is None:
-            st.warning("Upload an email CSV before sending the batch.")
-            return
-        try:
-            emails = read_email_csv(uploaded.getvalue())
-        except (UnicodeDecodeError, csv.Error, ValueError) as error:
-            st.error(f"Cannot read this CSV. Save it as UTF-8 and check its rows. Details: {error}")
-            return
         with st.spinner("Authenticating with Microsoft Entra..."):
             token = get_access_token()
         if token is None:
@@ -437,6 +502,9 @@ def show_batch_demo():
     if not batch:
         return
     st.subheader("Batch results", anchor=False)
+    comparison = st.empty()
+    with comparison.container():
+        show_comparison(batch["results"])
     panels = make_model_panels("_batch")
     for model, panel in panels.items():
         with panel.container():
@@ -458,6 +526,8 @@ def show_batch_demo():
         batch["results"][model] = result
         with panels[model].container():
             show_batch_result(result, emails)
+        with comparison.container():
+            show_comparison(batch["results"])
         progress.progress(completed / total, text=f"{completed} of {total} model calls finished")
     progress.empty()
 

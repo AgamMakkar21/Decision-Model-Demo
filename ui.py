@@ -12,6 +12,12 @@ STYLES = """
     --persimmon: #A54429;
     --muted: #5C6D61;
     --line: #D7DCCE;
+    --surface: #FEFDF8;
+    --track: #E5E8DC;
+    --border: #B3BDAE;
+    --button-base: #102D25;
+    --button-hover: #2A5949;
+    --on-color: #FEFDF8;
     --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
     --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
     --desk-font: "Open Sans", "Segoe UI", sans-serif;
@@ -24,18 +30,32 @@ STYLES = """
     color: var(--ink);
     font-family: var(--desk-font);
 }
+.stApp [data-testid="stMarkdownContainer"],
+.stApp [data-testid="stWidgetLabel"],
+.stApp [data-testid="stFileUploaderFileName"] { color: var(--ink); }
+.stApp [data-testid="stCaptionContainer"],
+.stApp [data-testid="stCaptionContainer"] p { color: var(--muted); }
+.stApp [data-testid="stCaptionContainer"] { opacity: 1; }
+.stApp :is(button, [role="tab"]) [data-testid="stMarkdownContainer"] { color: inherit; }
+.stApp [data-testid="stBaseButton-secondary"],
+.stApp [data-testid="stBaseButton-secondaryFormSubmit"] {
+    background: var(--surface);
+    color: var(--pine);
+    border-color: var(--border);
+}
+.stApp [data-testid="stExpander"] details { border-color: var(--line); }
 [data-testid="stHeader"] { background: transparent; }
 [data-testid="stMain"] { scrollbar-gutter: stable; }
 [data-testid="stMainBlockContainer"] {
     max-width: 1120px;
-    padding: 3.5rem 2rem 3rem;
+    padding: 3.5rem 2rem 2rem;
 }
 .desk-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding-bottom: 1rem;
+    padding-bottom: .5rem;
     border-bottom: 1px solid var(--pine);
 }
 .desk-brand {
@@ -49,11 +69,11 @@ STYLES = """
 .desk-note { color: var(--muted); font-size: .85rem; }
 .desk-intro {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 12rem;
+    grid-template-columns: minmax(0, 1fr) 8rem;
     align-items: center;
-    gap: 2rem;
-    padding: 2rem;
-    margin: 1.5rem 0 1rem;
+    gap: 1.5rem;
+    padding: 1rem 1.5rem;
+    margin: 1rem 0 0;
     background: var(--pine);
     border-radius: var(--radius);
     box-shadow: 5px 5px 0 var(--persimmon), 8px 10px 18px #203D3412;
@@ -61,12 +81,12 @@ STYLES = """
 .desk-intro h1 {
     font-family: var(--heading-font);
     font-weight: 400;
-    font-size: clamp(3.25rem, 7vw, 6rem);
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
     line-height: 1;
     letter-spacing: 0;
-    padding: 0 0 .75rem;
+    padding: 0 0 .5rem;
     margin: 0;
-    color: #FEFDF8;
+    color: var(--on-color);
     text-wrap: balance;
 }
 .desk-intro p {
@@ -77,26 +97,26 @@ STYLES = """
 }
 .desk-mail-art {
     position: relative;
-    height: 9rem;
+    height: 5.5rem;
     color: var(--paper);
 }
 .desk-mail-art::before, .desk-mail-art::after {
     content: "";
     position: absolute;
     right: 0;
-    width: 3rem;
-    height: 2.5rem;
+    width: 2rem;
+    height: 1.5rem;
     border: 2px solid currentColor;
     border-left: 0;
 }
-.desk-mail-art::before { top: 1rem; }
-.desk-mail-art::after { bottom: 1rem; }
+.desk-mail-art::before { top: .5rem; }
+.desk-mail-art::after { bottom: .5rem; }
 .desk-letter {
     position: absolute;
-    top: 2rem;
-    left: .5rem;
-    width: 8rem;
-    height: 5.25rem;
+    top: 1rem;
+    left: .25rem;
+    width: 5.5rem;
+    height: 3.5rem;
     border: 2px solid var(--paper);
     border-radius: var(--radius-small);
     background: var(--pine);
@@ -107,10 +127,10 @@ STYLES = """
 .desk-letter::before {
     content: "";
     position: absolute;
-    width: 5.75rem;
-    height: 5.75rem;
-    left: 1rem;
-    top: -3.4rem;
+    width: 4rem;
+    height: 4rem;
+    left: .6rem;
+    top: -2.4rem;
     border-right: 2px solid var(--paper);
     border-bottom: 2px solid var(--paper);
     transform: rotate(45deg);
@@ -118,10 +138,10 @@ STYLES = """
 .desk-letter::after {
     content: "";
     position: absolute;
-    right: .6rem;
-    bottom: .6rem;
-    width: 1rem;
-    height: 1.2rem;
+    right: .4rem;
+    bottom: .4rem;
+    width: .75rem;
+    height: .85rem;
     background: var(--persimmon);
     border: 1px solid var(--paper);
 }
@@ -131,7 +151,7 @@ STYLES = """
     width: min(100%, 22rem);
     gap: 0;
     padding: .35rem .35rem 0;
-    background: #E5E8DC;
+    background: var(--track);
     border-radius: var(--radius) var(--radius) 0 0;
     border-bottom: 1px solid var(--pine);
 }
@@ -147,6 +167,7 @@ STYLES = """
     border: 1px solid var(--pine);
     border-bottom: 0;
     border-radius: var(--radius-small) var(--radius-small) 0 0;
+    box-shadow: inset 0 -3px 0 var(--persimmon);
     transform: translateX(0);
     pointer-events: none;
 }
@@ -165,8 +186,30 @@ STYLES = """
     border: 0;
     color: var(--muted);
 }
-[role="tablist"] [role="tab"][aria-selected="true"] { color: #FEFDF8; }
+[role="tablist"] [role="tab"][aria-selected="true"] { color: var(--on-color); }
 [role="tablist"] [role="tab"] p { font-weight: 700; }
+[role="tablist"] [role="tab"]::before {
+    content: "";
+    flex-shrink: 0;
+    width: .9rem;
+    height: .65rem;
+    margin-right: .55rem;
+    border: 1.5px solid currentColor;
+    border-radius: var(--radius-small);
+    transform: rotate(-8deg);
+}
+[role="tablist"] [role="tab"]:nth-child(2)::before {
+    box-shadow: 2px -3px 0 -1px var(--track), 2px -3px 0 0 currentColor;
+}
+[role="tablist"][data-pointer-motion="true"] [role="tab"]::before {
+    transition: transform 160ms var(--ease-out);
+}
+[role="tablist"] [role="tab"][aria-selected="true"]::before {
+    transform: translateY(-1px) rotate(0);
+}
+[role="tablist"][data-pointer-motion="true"] [role="tab"]:active::before {
+    transform: scale(.9);
+}
 [role="tablist"] .react-aria-SelectionIndicator { display: none; }
 [role="tablist"] [role="tab"]:focus-visible {
     outline: 2px solid var(--persimmon);
@@ -174,11 +217,11 @@ STYLES = """
     border-radius: var(--radius-small) var(--radius-small) 0 0;
 }
 [data-testid="stForm"], .st-key-batch_input {
-    background: #FEFDF8;
-    border: 1px solid #B3BDAE;
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 1.5rem;
-    box-shadow: 3px 4px 0 #D7DCCE, 5px 7px 16px #203D3408;
+    padding: 1rem;
+    box-shadow: 3px 4px 0 var(--line), 5px 7px 16px #203D3408;
 }
 [data-testid="stWidgetLabel"] p {
     font-family: var(--desk-font);
@@ -186,11 +229,14 @@ STYLES = """
     font-size: .95rem;
 }
 [data-testid="stFileUploaderDropzone"] {
+    background: var(--track);
+    color: var(--ink);
     border: 1px dashed var(--pine);
     border-radius: var(--radius-small);
 }
+[data-testid="stFileUploaderDropzone"] small { color: var(--muted); }
 [data-testid="stTextAreaRootElement"] {
-    border: 1px solid #B3BDAE;
+    border: 1px solid var(--border);
     border-radius: var(--radius);
     background: var(--paper);
     overflow: hidden;
@@ -214,47 +260,84 @@ STYLES = """
     color: var(--muted);
     opacity: 1;
 }
-:is([data-testid="stFormSubmitButton"], .st-key-batch_actions [data-testid="stButton"]) button {
+:is(.st-key-send_email, .st-key-batch_actions [data-testid="stButton"]) button {
     background: var(--pine);
-    color: #FEFDF8;
+    color: var(--on-color);
     border: 1px solid var(--pine);
     border-radius: var(--radius);
     min-height: 2.85rem;
+    max-width: 100%;
     padding: .6rem 1.1rem;
-    box-shadow: 0 4px 0 #102D25, 0 7px 12px #203D3418;
+    box-shadow: 0 5px 0 var(--button-base), 0 8px 12px #203D3418;
     transform: translateY(-2px);
     transition: transform 160ms var(--ease-out);
 }
-:is([data-testid="stFormSubmitButton"], .st-key-batch_actions [data-testid="stButton"]) {
+:is(.st-key-send_email, .st-key-batch_actions [data-testid="stButton"]) button::before {
+    content: "";
+    flex-shrink: 0;
+    width: 1.05rem;
+    height: .75rem;
+    margin-right: .3rem;
+    border: 1.5px solid currentColor;
+    border-radius: var(--radius-small);
+    background: linear-gradient(32deg, transparent 47%, currentColor 49% 53%, transparent 55%)
+        left top / 50% 70% no-repeat,
+        linear-gradient(-32deg, transparent 47%, currentColor 49% 53%, transparent 55%)
+        right top / 50% 70% no-repeat;
+    transform: rotate(-8deg);
+    transition: transform 160ms var(--ease-out);
+}
+:is(.st-key-send_email, .st-key-batch_actions [data-testid="stButton"]) button::after {
+    content: "";
+    flex-shrink: 0;
+    width: .4rem;
+    height: .4rem;
+    margin-left: .3rem;
+    border-top: 2px solid currentColor;
+    border-right: 2px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform 160ms var(--ease-out);
+}
+:is(.st-key-send_email, .st-key-batch_actions [data-testid="stButton"]) {
     padding-top: 2px;
     padding-bottom: 4px;
 }
-.st-key-batch_actions [data-testid="stDownloadButton"] {
+:is(.st-key-sample_email, .st-key-batch_actions [data-testid="stDownloadButton"]) {
     padding-top: 2px;
     padding-bottom: 4px;
 }
-.st-key-batch_actions [data-testid="stDownloadButton"] button {
+:is(.st-key-sample_email, .st-key-batch_actions [data-testid="stDownloadButton"]) button {
     min-height: 2.85rem;
     padding: .6rem 1.1rem;
     border-radius: var(--radius);
     transform: translateY(-2px);
+    box-shadow: 0 4px 0 var(--line), 0 6px 10px #203D3410;
+    transition: transform 160ms var(--ease-out);
 }
-:is([data-testid="stFormSubmitButton"], .st-key-batch_actions [data-testid="stButton"]) button:not(:disabled):active:not(:focus-visible) {
+:is(.st-key-send_email, .st-key-batch_actions [data-testid="stButton"]) button:not(:disabled):active:not(:focus-visible) {
+    transform: translateY(3px) scale(.97);
+}
+:is(.st-key-sample_email, .st-key-batch_actions [data-testid="stDownloadButton"]) button:active:not(:focus-visible) {
     transform: translateY(2px) scale(.97);
 }
-:is([data-testid="stFormSubmitButton"], .st-key-batch_actions [data-testid="stButton"]) button:focus-visible { transition: none; }
-:is([data-testid="stFormSubmitButton"], .st-key-batch_actions [data-testid="stButton"]) button p {
+:is([data-testid="stFormSubmitButton"], .st-key-batch_actions) button:focus-visible {
+    transition: none;
+    transform: none;
+}
+:is(.st-key-send_email, .st-key-batch_actions [data-testid="stButton"]) button p {
     font-family: var(--desk-font);
     font-weight: 700;
+    white-space: normal;
+    min-width: 0;
 }
-:is([data-testid="stFormSubmitButton"], .st-key-batch_actions [data-testid="stButton"]) button:focus-visible {
+:is(.st-key-send_email, .st-key-batch_actions [data-testid="stButton"]) button:focus-visible {
     outline: 3px solid var(--persimmon);
     outline-offset: 3px;
 }
-:is([data-testid="stFormSubmitButton"], .st-key-batch_actions [data-testid="stButton"]) button:disabled {
-    background: #D7DCCE;
-    color: #5C6D61;
-    border-color: #D7DCCE;
+:is(.st-key-send_email, .st-key-batch_actions [data-testid="stButton"]) button:disabled {
+    background: var(--line);
+    color: var(--muted);
+    border-color: var(--line);
     box-shadow: none;
     transform: none;
 }
@@ -262,9 +345,9 @@ STYLES = """
     --model-color: var(--pine);
     border: 1px solid var(--model-color);
     border-radius: var(--radius);
-    background: #FEFDF8;
-    padding: 1.25rem;
-    gap: .85rem;
+    background: var(--surface);
+    padding: 1rem;
+    gap: .75rem;
     min-width: 0;
 }
 [class*="st-key-gpt_panel"] { --model-color: var(--persimmon); }
@@ -273,7 +356,7 @@ STYLES = """
     font-weight: 400;
     color: var(--model-color, var(--pine));
     font-size: 1.35rem;
-    padding: 1rem 0 .25rem;
+    padding: .5rem 0 .25rem;
     margin: 0;
 }
 .batch-email-preview {
@@ -290,21 +373,21 @@ STYLES = """
     justify-content: space-between;
     gap: .75rem;
     flex-wrap: wrap;
-    margin: -1.25rem -1.25rem .25rem;
-    padding: 1rem 1.25rem;
+    margin: -1rem -1rem .25rem;
+    padding: .75rem 1rem;
     background: var(--model-color);
     border-radius: var(--radius-small) var(--radius-small) 0 0;
 }
 .model-heading h2 {
     font-family: var(--heading-font);
     font-weight: 400;
-    color: #FEFDF8;
+    color: var(--on-color);
     font-size: 1.85rem;
     letter-spacing: 0;
     margin: 0;
     padding: 0;
 }
-.model-heading span { font-size: .8rem; color: #FEFDF8; }
+.model-heading span { font-size: .8rem; color: var(--on-color); }
 .model-status {
     display: flex;
     align-items: center;
@@ -321,7 +404,7 @@ STYLES = """
     height: .5rem;
     flex-shrink: 0;
     border-radius: 50%;
-    background: #7A8979;
+    background: var(--muted);
 }
 .model-status.is-loading { min-height: 3rem; gap: .75rem; }
 .model-status.is-loading::before { display: none; }
@@ -359,7 +442,7 @@ STYLES = """
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
     gap: 1rem;
     margin: 0;
-    padding: .5rem 0 1rem;
+    padding: .25rem 0 .75rem;
     border-bottom: 1px solid var(--line);
     font-variant-numeric: tabular-nums;
     opacity: 1;
@@ -385,7 +468,7 @@ STYLES = """
 .likelihood p { font-size: .85rem; line-height: 1.4; margin: 0 0 .35rem; }
 .likelihood-track {
     height: .8rem;
-    background: #E5E8DC;
+    background: var(--track);
     border-radius: var(--radius-small);
     overflow: hidden;
 }
@@ -406,12 +489,21 @@ STYLES = """
     transform: scale(.99);
 }
 @media (hover: hover) and (pointer: fine) {
-    :is([data-testid="stFormSubmitButton"], .st-key-batch_actions [data-testid="stButton"]) button:not(:disabled):hover {
-        background: #2A5949;
-        color: #FEFDF8;
-        border-color: #2A5949;
+    :is(.st-key-send_email, .st-key-batch_actions [data-testid="stButton"]) button:not(:disabled):hover {
+        background: var(--button-hover);
+        color: var(--on-color);
+        border-color: var(--button-hover);
     }
-    :is([data-testid="stFormSubmitButton"], .st-key-batch_actions [data-testid="stButton"]) button:not(:disabled):hover:not(:active):not(:focus-visible) {
+    :is(.st-key-send_email, .st-key-batch_actions [data-testid="stButton"]) button:not(:disabled):hover:not(:active):not(:focus-visible) {
+        transform: translateY(-3px);
+    }
+    :is(.st-key-send_email, .st-key-batch_actions [data-testid="stButton"]) button:not(:disabled):hover:not(:active):not(:focus-visible)::before {
+        transform: translate(2px, -2px) rotate(0);
+    }
+    :is(.st-key-send_email, .st-key-batch_actions [data-testid="stButton"]) button:not(:disabled):hover:not(:active):not(:focus-visible)::after {
+        transform: translateX(3px) rotate(45deg);
+    }
+    :is(.st-key-sample_email, .st-key-batch_actions [data-testid="stDownloadButton"]) button:hover:not(:active):not(:focus-visible) {
         transform: translateY(-3px);
     }
 }
@@ -420,26 +512,27 @@ STYLES = """
     .desk-note { display: none; }
     .desk-intro {
         grid-template-columns: minmax(0, 1fr);
-        padding: 1.5rem;
+        padding: 1rem;
         margin-top: 1rem;
         gap: 0;
     }
     .desk-mail-art { display: none; }
-    [data-testid="stForm"], .st-key-batch_input,
-    [class*="st-key-decision_panel"], [class*="st-key-gpt_panel"] {
-        padding: 1rem;
-    }
-    .model-heading {
-        margin: -1rem -1rem .25rem;
-        padding: .85rem 1rem;
-    }
     .result-metrics dd { font-size: 1.2rem; }
 }
 @media (prefers-reduced-motion: reduce) {
     [role="tablist"][data-pointer-motion="true"]::before { transition: none; }
+    [role="tablist"] [role="tab"]::before {
+        transition: none !important;
+        transform: none !important;
+    }
     .dispatch-envelope { animation: none; }
     :is([data-testid="stFormSubmitButton"], .st-key-batch_actions) button {
-        transition: none;
+        transition: none !important;
+        transform: none !important;
+    }
+    :is([data-testid="stFormSubmitButton"], .st-key-batch_actions) button::before,
+    :is([data-testid="stFormSubmitButton"], .st-key-batch_actions) button::after {
+        transition: none !important;
         transform: none !important;
     }
     .model-status { transition-duration: 100ms; }
@@ -585,8 +678,7 @@ def show_intro():
                 <span class="desk-letter"></span>
             </div>
         </div>
-    """)
-    st.html(DETAILS_SCRIPT, unsafe_allow_javascript=True)
+    """ + DETAILS_SCRIPT, unsafe_allow_javascript=True)
 
 
 def show_model_heading(model, description):
